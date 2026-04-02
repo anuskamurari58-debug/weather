@@ -23,4 +23,5 @@ def index(request):
         "selected_city": selected_city,
         "weather_data": weather_data,
         "error": error,
+
     })
