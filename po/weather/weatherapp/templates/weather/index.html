@@ -3,23 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather App</title>
+    <title>Weather App - Indian States</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
+            background-color: #f5f5f5;
         }
-        form {
-            margin-bottom: 20px;
+        .container {
+            background: white;
+            padding: 20px;
+            border: 1px solid #ddd;
         }
-        input[type="text"] {
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select {
+            width: 100%;
             padding: 8px;
-            width: 200px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
         }
         button {
-            padding: 8px 16px;
+            width: 100%;
+            padding: 10px;
             background-color: #007bff;
             color: white;
             border: none;
@@ -30,35 +45,79 @@
         }
         .weather-info {
             border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .weather-info h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .weather-info p {
+            margin: 8px 0;
+            color: #555;
+        }
+        .weather-icon {
+            font-size: 40px;
+            text-align: center;
+            margin: 10px 0;
         }
         .error {
             color: red;
+            background-color: #f9d5d5;
+            padding: 10px;
+            margin-top: 15px;
+            border: 1px solid red;
         }
     </style>
 </head>
 <body>
-    <h1>Weather App</h1>
-    <form method="post">
-        {% csrf_token %}
-        <label for="city">Enter City:</label>
-        <input type="text" id="city" name="city" placeholder="e.g., London" required>
-        <button type="submit">Get Weather</button>
-    </form>
+    <div class="container">
+        <h1>🌤️ Weather App - Indian States</h1>
+        <form method="post">
+            {% csrf_token %}
+            <div style="width: 100%;">
+                <label for="state">Select a State:</label>
+                <select id="state" name="state" required>
+                    <option value="">-- Choose a State --</option>
+                    {% for state in states %}
+                        <option value="{{ state }}" {% if state == selected_state %}selected{% endif %}>
+                            {{ state|title }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Get Weather</button>
+            </div>
+        </form>
 
-    {% if weather_data %}
-        <div class="weather-info">
-            <h2>Weather in {{ weather_data.city }}, {{ weather_data.country }}</h2>
-            <p><strong>Temperature:</strong> {{ weather_data.temperature }}°C</p>
-            <p><strong>Description:</strong> {{ weather_data.description|title }}</p>
-            <p><strong>Humidity:</strong> {{ weather_data.humidity }}%</p>
-            <p><strong>Wind Speed:</strong> {{ weather_data.wind_speed }} km/h</p>
-        </div>
-    {% endif %}
+        {% if weather_data %}
+            <div class="weather-info">
+                <h2>{{ weather_data.city }}, {{ weather_data.state }}</h2>
+                <div class="weather-icon">
+                    {% if "Rainy" in weather_data.description or "Monsoon" in weather_data.description %}
+                        🌧️
+                    {% elif "Clear" in weather_data.description or "Sunny" in weather_data.description %}
+                        ☀️
+                    {% elif "Cloudy" in weather_data.description %}
+                        ☁️
+                    {% elif "Hot" in weather_data.description %}
+                        🔥
+                    {% elif "Humid" in weather_data.description %}
+                        💧
+                    {% endif %}
+                </div>
+                <p><strong>🌡️ Temperature:</strong> {{ weather_data.temperature }}°C</p>
+                <p><strong>📝 Condition:</strong> {{ weather_data.description }}</p>
+                <p><strong>💧 Humidity:</strong> {{ weather_data.humidity }}%</p>
+                <p><strong>💨 Wind Speed:</strong> {{ weather_data.wind_speed }} km/h</p>
+                <p><strong>🌍 Country:</strong> {{ weather_data.country }}</p>
+            </div>
+        {% endif %}
 
-    {% if error %}
-        <p class="error">{{ error }}</p>
-    {% endif %}
+        {% if error %}
+            <div class="error">
+                ⚠️ {{ error }}
+            </div>
+        {% endif %}
+    </div>
 </body>
 </html>
